@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/spf13/viper/remote"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -57,8 +58,6 @@ func SetEnvFromConsulKV(v *viper.Viper) error {
 			val = strconv.Itoa(int(valOf.Float()))
 		case reflect.Bool:
 			val = strconv.FormatBool(valOf.Bool())
-		default:
-			panic("unsupported type")
 		}
 
 		err = os.Setenv(k, val)

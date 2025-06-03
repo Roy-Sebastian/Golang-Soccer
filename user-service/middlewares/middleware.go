@@ -52,7 +52,7 @@ func RateLimiter(lmt *limiter.Limiter) gin.HandlerFunc {
 
 func extractBearerToken(token string) string {
 	arrayToken := strings.Split(token, " ")
-	if len(arrayToken) != 2 {
+	if len(arrayToken) == 2 {
 		return arrayToken[1]
 	}
 	return ""
@@ -100,14 +100,16 @@ func validateBearerToken(c *gin.Context, token string) error {
 		if !ok {
 			return nil, errConstant.ErrInvalidToken
 		}
-
 		jwtSecret := []byte(config.Config.JwtSecretKey)
 		return jwtSecret, nil
 	})
 
-	if err != nil || !tokenJwt.Valid{
+	if err != nil || !tokenJwt.Valid {
 		return errConstant.ErrUnauthorized
 	}
+
+	// Debug log for UUID
+	fmt.Printf("DEBUG: Extracted UUID from claims: %v\n", claims.User.UUID)
 
 	userLogin := c.Request.WithContext(context.WithValue(c.Request.Context(), constants.UserLogin, claims.User))
 	c.Request = userLogin
@@ -119,7 +121,7 @@ func validateBearerToken(c *gin.Context, token string) error {
 	return func(c *gin.Context) {
 		var err error
 		token := c.GetHeader(constants.Authorization)
-		if token != "" {
+		if token == "" {
 			responseUnauthorized(c, errConstant.ErrUnauthorized.Error())
 			return
 		}
